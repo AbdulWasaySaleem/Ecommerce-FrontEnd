@@ -3,7 +3,7 @@ import { Trash2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/authContext";
 import api from "../services/api";
-import axios from "axios";
+
 
 export const Wishlist: React.FC = () => {
   const [wishlist, setWishlist] = useState([]);
@@ -24,8 +24,8 @@ export const Wishlist: React.FC = () => {
 
   const fetchWishlist = async () => {
     try {
-      const response = await axios.get(
-        "http://localhost:3000/api/user/wishlist",
+      const response = await api.get(
+        "/api/user/wishlist",
         {
           headers: { Authorization: `Bearer ${auth.token}` },
         }
@@ -46,6 +46,15 @@ export const Wishlist: React.FC = () => {
       console.error("Error removing from wishlist:", error);
     }
   };
+
+  const handelNaviation = (item: any) => {
+    try {
+      window.open(item.productLink, "_blank"); // ✅ Opens in new tab
+    } catch (error) {
+      console.error("Error opening product link:", error);
+    }
+  };
+  
 
   if (loading) {
     return (
@@ -85,7 +94,7 @@ export const Wishlist: React.FC = () => {
                     <Trash2 className="h-5 w-5" />
                   </button>
                   <button
-                    onClick={() => navigate(`/product/${item._id}`)}
+                    onClick={() => handelNaviation(item)}
                     className="flex-1 p-2 text-blue-500 hover:text-blue-700 border rounded-md"
                   >
                     View Product
