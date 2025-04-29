@@ -14,20 +14,38 @@ export const ProductCard: React.FC<ProductCardProps> = ({
     (item) => item.productLink === product.productLink
   );
 
-  const handleWishlist = async (productId: string) => {
+  const handleWishlist = async (productId: string, productLink: string) => {
     try {
-      const response = await api.post(
-        "/api/user/addtowishlist",
-        { productId },
-        {
-          headers: {
-            Authorization: `Bearer ${auth.token}`,
-          },
-        }
+      const wishlistItem = wishlists?.find(
+        (item) => item.productLink === productLink
       );
-      console.log("Added to wishlist:", response.data.message);
+
+      if (wishlistItem) {
+        // Remove from wishlist using the wishlist item's _id
+        const response = await api.delete(
+          `/api/user/removefromwishlist/${wishlistItem._id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${auth.token}`,
+            },
+          }
+        );
+        alert("Removed from wishlist:" + response.data.message);
+      } else {
+        // Add to wishlist using the product ID
+        const response = await api.post(
+          "/api/user/addtowishlist",
+          { productId },
+          {
+            headers: {
+              Authorization: `Bearer ${auth.token}`,
+            },
+          }
+        );
+        console.log("Added to wishlist:", response.data.message);
+      }
     } catch (error) {
-      console.error("Error adding to wishlist:", error.message);
+      console.error("Error managing wishlist:", error.message);
     }
   };
 
@@ -43,7 +61,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         </Link>
 
         <button
-          onClick={() => handleWishlist(product._id)}
+          onClick={() => handleWishlist(product._id, product.productLink)}
           className={`absolute top-2 right-2 p-2 rounded-full bg-white shadow-md ${
             isInWishlist ? "text-red-500" : "text-gray-400"
           }`}
