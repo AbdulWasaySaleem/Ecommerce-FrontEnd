@@ -3,6 +3,7 @@ import { Trash2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/authContext";
 import api from "../services/api";
+import axios from "axios";
 
 export const Wishlist: React.FC = () => {
   const [wishlist, setWishlist] = useState([]);
@@ -23,20 +24,21 @@ export const Wishlist: React.FC = () => {
 
   const fetchWishlist = async () => {
     try {
-      const response = await api.get("/api/user/wishlist", {
-        headers: { Authorization: `Bearer ${auth.token}` },
-      });
-      console.log(response.data);
+      const response = await axios.get(
+        "http://localhost:3000/api/user/wishlist",
+        {
+          headers: { Authorization: `Bearer ${auth.token}` },
+        }
+      );
       setWishlist(response.data?.data || []);
     } catch (error) {
       console.error("Error fetching wishlist:", error);
     }
   };
-  
 
   const handelRemoveFromWishlist = async (productId: string) => {
     try {
-      await api.delete(`/api/user/wishlist/${productId}`, {
+      await api.delete(`/api/user/removefromwishlist/${productId}`, {
         headers: { Authorization: `Bearer ${auth.token}` },
       });
       setWishlist((prev) => prev.filter((item) => item._id !== productId));
@@ -46,9 +48,12 @@ export const Wishlist: React.FC = () => {
   };
 
   if (loading) {
-    return <div className="text-center py-20">Loading...</div>;
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-red-500"></div>
+      </div>
+    );
   }
-
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-2xl font-bold mb-8">My Wishlist</h1>
@@ -60,15 +65,18 @@ export const Wishlist: React.FC = () => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {wishlist.map((item) => (
-            <div key={item._id} className="bg-white rounded-lg shadow-md overflow-hidden">
+            <div
+              key={item._id}
+              className="bg-white rounded-lg shadow-md overflow-hidden"
+            >
               <img
-                src={item.imageLink}
+                src={item.productImage}
                 alt={item.productName}
                 className="w-full h-48 object-cover"
               />
               <div className="p-4">
                 <h3 className="font-semibold mb-2">{item.productName}</h3>
-         
+                <p>sale Price{item.salePrice}</p>
                 <div className="flex gap-2">
                   <button
                     onClick={() => handelRemoveFromWishlist(item._id)}

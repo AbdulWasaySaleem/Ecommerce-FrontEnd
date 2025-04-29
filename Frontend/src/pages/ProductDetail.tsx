@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { Heart } from 'lucide-react';
 import { useShop } from '../context/ShopContext';
 import axios from 'axios';
+import api from '../services/api';
 
 export const ProductDetail = () => {
   const { id } = useParams();
@@ -14,7 +15,7 @@ export const ProductDetail = () => {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const response = await axios.get(`http://localhost:3000/api/products/getProduct/${id}`);
+        const response = await api.get(`/api/products/getProduct/${id}`);
         setProduct(response.data);
       } catch (error) {
         console.error("Failed to fetch product:", error);
